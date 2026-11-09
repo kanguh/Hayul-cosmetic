@@ -1,0 +1,127 @@
+@import "tailwindcss";
+@import "lenis/dist/lenis.css";
+
+@theme {
+  --color-cream: #f4eee6;
+  --color-sand: #e8dccd;
+  --color-clay: #b9785a;
+  --color-clay-deep: #8f553b;
+  --color-rose: #e9c6b7;
+  --color-ink: #1f1714;
+  --color-ink-soft: #5a4b44;
+  --color-moss: #6e7a5a;
+  --color-mist: #dce1d3;
+
+  --font-display: var(--font-cormorant), "Cormorant Garamond", var(--font-serif-kr), serif;
+  --font-serif: var(--font-serif-kr), "Noto Serif KR", serif;
+  --font-sans: var(--font-sans-kr), "Noto Sans KR", system-ui, sans-serif;
+
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-marquee: marquee 38s linear infinite;
+  --animate-spin-slow: spin 18s linear infinite;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+html {
+  background: var(--color-cream);
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-ink);
+  word-break: keep-all;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-clay);
+  color: var(--color-cream);
+}
+
+/* 종이 같은 미세한 질감 */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* 커스텀 커서를 쓰는 기기에서는 기본 커서 숨김 */
+@media (pointer: fine) {
+  html.has-cursor,
+  html.has-cursor a,
+  html.has-cursor button {
+    cursor: none;
+  }
+}
+
+/* ---------- 페이지 전환 (React ViewTransition) ---------- */
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+/* 헤더는 전환 중에도 제자리에 고정 */
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(site-header) {
+  display: none;
+}
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+::view-transition-old(.page-out) {
+  animation: 260ms var(--ease-expo) both page-leave;
+}
+::view-transition-new(.page-in) {
+  animation: 700ms var(--ease-expo) 120ms both page-enter;
+}
+
+@keyframes page-leave {
+  to {
+    opacity: 0;
+    transform: translateY(-24px);
+    filter: blur(4px);
+  }
+}
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(48px);
+    filter: blur(6px);
+  }
+}
+
+/* 상품 이미지가 목록 → 상세로 이어지는 모핑 */
+::view-transition-group(.morph) {
+  animation-duration: 650ms;
+  animation-timing-function: var(--ease-expo);
+}
+::view-transition-image-pair(.morph) {
+  animation-name: via-blur;
+}
+@keyframes via-blur {
+  40% {
+    filter: blur(2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
